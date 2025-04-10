@@ -1,20 +1,19 @@
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import Head from '@/components/Head';
 
 export default function HomePage() {
   return (
     <>
-      <Head>
+      <DocumentHead>
         <title>Paymesa - Dashboard</title>
         <meta name="description" content="Paymesa payment service provider dashboard" />
-      </Head>
+      </DocumentHead>
       <Dashboard />
     </>
   );
 }
 
 // Head component for adding meta tags
-function Head({ children }: { children: React.ReactNode }) {
+function DocumentHead({ children }: { children: React.ReactNode }) {
   if (typeof document !== 'undefined') {
     // Get the head element
     const head = document.head;
