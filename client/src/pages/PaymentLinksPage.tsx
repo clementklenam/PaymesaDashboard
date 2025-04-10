@@ -25,7 +25,8 @@ import {
   X,
   Check,
   QrCode,
-  Share2
+  Share2,
+  Info
 } from "lucide-react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -237,7 +238,7 @@ export default function PaymentLinksPage() {
   const PaymentLinkBuilder = () => {
     return (
       <Dialog open={showBuilder} onOpenChange={setShowBuilder}>
-        <DialogContent className="max-w-6xl">
+        <DialogContent className="sm:max-w-[90%] md:max-w-[90%] lg:max-w-[90%] xl:max-w-[80%] h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create Payment Link</DialogTitle>
             <DialogDescription>
@@ -247,7 +248,7 @@ export default function PaymentLinksPage() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
             {/* Form */}
-            <div className="space-y-6">
+            <div className="space-y-6 h-full overflow-y-auto pr-2">
               <div className="space-y-3">
                 <h3 className="text-base font-medium">Basic Information</h3>
                 <div className="space-y-3">
@@ -274,7 +275,7 @@ export default function PaymentLinksPage() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="price">Price</Label>
                       <div className="relative">
@@ -457,183 +458,200 @@ export default function PaymentLinksPage() {
             </div>
             
             {/* Preview */}
-            <div className="space-y-4">
-              <h3 className="text-base font-medium">Preview</h3>
-              
-              <div className={`border rounded-lg overflow-hidden ${
-                formData.theme === 'dark' ? 'bg-gray-900 text-white' :
-                formData.theme === 'blue' ? 'bg-blue-50' :
-                formData.theme === 'green' ? 'bg-green-50' :
-                formData.theme === 'purple' ? 'bg-purple-50' :
-                'bg-white'
-              }`}>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <div className={`${
-                      formData.theme === 'dark' ? 'text-white' :
-                      formData.theme === 'blue' ? 'text-blue-600' :
-                      formData.theme === 'green' ? 'text-green-600' :
-                      formData.theme === 'purple' ? 'text-purple-600' :
-                      'text-primary'
-                    } text-xl font-bold`}>Paymesa</div>
-                    
-                    <div className={`${
-                      formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                    } text-sm flex items-center`}>
-                      <Globe className="h-4 w-4 mr-1" />
-                      Secure payment
-                    </div>
-                  </div>
-                  
-                  {formData.image && (
-                    <div className="mb-4 rounded-lg overflow-hidden h-40 bg-gray-100 flex items-center justify-center">
-                      <Image className="h-10 w-10 text-gray-400" />
-                    </div>
-                  )}
-                  
-                  <div className="mb-6">
-                    <h2 className={`text-lg font-semibold ${
-                      formData.theme === 'dark' ? 'text-white' : 'text-gray-800'
-                    }`}>
-                      {formData.name || 'Product or Service Name'}
-                    </h2>
-                    <p className={`${
-                      formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                      {formData.description || 'Product or service description goes here'}
-                    </p>
-                  </div>
-                  
-                  <div className={`${
-                    formData.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
-                  } p-4 rounded-lg mb-6`}>
-                    <div className="flex justify-between mb-3">
-                      <span className={`${
-                        formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                      }`}>Price</span>
-                      <span className="font-semibold">
-                        {formData.allowCustomAmount ? 'Custom amount' : 
-                          formData.price ? 
-                            `${formData.currency === 'USD' ? '$' : 
-                              formData.currency === 'EUR' ? '€' : 
-                              formData.currency === 'GBP' ? '£' : 
-                              formData.currency}${formData.price}` 
-                            : '$0.00'}
-                      </span>
-                    </div>
-                    
-                    {formData.enableTax && !formData.allowCustomAmount && (
-                      <>
-                        <div className="flex justify-between mb-3">
-                          <span className={`${
-                            formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                          }`}>Tax ({formData.taxPercentage}%)</span>
-                          <span className="font-semibold">
-                            {formData.price ? 
-                              `${formData.currency === 'USD' ? '$' : 
-                                formData.currency === 'EUR' ? '€' : 
-                                formData.currency === 'GBP' ? '£' : 
-                                formData.currency}${(parseFloat(formData.price) * parseFloat(formData.taxPercentage) / 100).toFixed(2)}` 
-                              : '$0.00'}
-                          </span>
-                        </div>
-                        
-                        <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                        
-                        <div className="flex justify-between font-bold">
-                          <span>Total</span>
-                          <span>
-                            {formData.currency === 'USD' ? '$' : 
-                              formData.currency === 'EUR' ? '€' : 
-                              formData.currency === 'GBP' ? '£' : 
-                              formData.currency}
-                            {calculateTotal()}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  
-                  {formData.allowCustomAmount && (
-                    <div className="mb-6">
-                      <Label htmlFor="customAmount" className={`${
-                        formData.theme === 'dark' ? 'text-white' : 'text-gray-700'
-                      }`}>
-                        Enter amount
-                      </Label>
-                      <div className="relative mt-1">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                          <span className={`${
-                            formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                          }`}>$</span>
-                        </div>
-                        <Input 
-                          id="customAmount" 
-                          placeholder="0.00"
-                          className={`pl-8 ${
-                            formData.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : ''
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="mb-6">
-                    <Label htmlFor="paymentMethod" className={`${
-                      formData.theme === 'dark' ? 'text-white' : 'text-gray-700'
-                    }`}>
-                      Payment method
-                    </Label>
-                    <div className={`mt-2 flex flex-wrap gap-2 ${
-                      formData.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
-                    } p-3 rounded-lg`}>
-                      <div className={`flex items-center rounded-md px-3 py-2 ${
-                        formData.theme === 'dark' ? 'bg-gray-700' : 'bg-white border border-gray-200'
-                      }`}>
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        <span className="text-sm">Card</span>
-                      </div>
-                      
-                      <div className={`flex items-center rounded-md px-3 py-2 ${
-                        formData.theme === 'dark' ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        <Smartphone className="h-4 w-4 mr-2" />
-                        <span className="text-sm">Mobile Pay</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    className={`w-full ${
-                      formData.theme === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
-                      formData.theme === 'green' ? 'bg-green-600 hover:bg-green-700' :
-                      formData.theme === 'purple' ? 'bg-purple-600 hover:bg-purple-700' :
-                      ''
-                    }`}
-                  >
-                    {formData.buttonText || 'Pay Now'}
+            <div className="space-y-4 h-full overflow-y-auto pb-4">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-base font-medium">Preview</h3>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm">
+                    <Smartphone className="h-4 w-4 mr-1"/>
+                    Mobile view
                   </Button>
-                  
-                  {formData.termsAndConditions && (
-                    <div className={`mt-4 text-xs ${
-                      formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
-                      By proceeding with the payment, you agree to the <span className="underline">terms and conditions</span>.
-                    </div>
-                  )}
-                </div>
-                
-                <div className={`p-4 border-t ${
-                  formData.theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
-                } text-xs text-center flex justify-center items-center gap-2`}>
-                  <span className={formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
-                    Powered by
-                  </span>
-                  <span className="font-semibold">Paymesa</span>
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4 mr-1"/>
+                    Preview
+                  </Button>
                 </div>
               </div>
               
-              <div className="flex flex-col space-y-3">
+              <div className="border rounded-lg overflow-hidden shadow-md max-w-md mx-auto bg-white">
+                <div 
+                  className={`${
+                    formData.theme === 'dark' ? 'bg-gray-900 text-white' :
+                    formData.theme === 'blue' ? 'bg-blue-50' :
+                    formData.theme === 'green' ? 'bg-green-50' :
+                    formData.theme === 'purple' ? 'bg-purple-50' :
+                    'bg-white'
+                  }`}
+                >
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <div className={`${
+                        formData.theme === 'dark' ? 'text-white' :
+                        formData.theme === 'blue' ? 'text-blue-600' :
+                        formData.theme === 'green' ? 'text-green-600' :
+                        formData.theme === 'purple' ? 'text-purple-600' :
+                        'text-primary'
+                      } text-xl font-bold`}>Paymesa</div>
+                      
+                      <div className={`${
+                        formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      } text-sm flex items-center`}>
+                        <Globe className="h-4 w-4 mr-1" />
+                        Secure payment
+                      </div>
+                    </div>
+                    
+                    {formData.image && (
+                      <div className="mb-4 rounded-lg overflow-hidden h-40 bg-gray-100 flex items-center justify-center">
+                        <Image className="h-10 w-10 text-gray-400" />
+                      </div>
+                    )}
+                    
+                    <div className="mb-6">
+                      <h2 className={`text-lg font-semibold ${
+                        formData.theme === 'dark' ? 'text-white' : 'text-gray-800'
+                      }`}>
+                        {formData.name || 'Product or Service Name'}
+                      </h2>
+                      <p className={`${
+                        formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
+                        {formData.description || 'Product or service description goes here'}
+                      </p>
+                    </div>
+                    
+                    <div className={`${
+                      formData.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-4 rounded-lg mb-6`}>
+                      <div className="flex justify-between mb-3">
+                        <span className={`${
+                          formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}>Price</span>
+                        <span className="font-semibold">
+                          {formData.allowCustomAmount ? 'Custom amount' : 
+                            formData.price ? 
+                              `${formData.currency === 'USD' ? '$' : 
+                                formData.currency === 'EUR' ? '€' : 
+                                formData.currency === 'GBP' ? '£' : 
+                                formData.currency}${formData.price}` 
+                              : '$0.00'}
+                        </span>
+                      </div>
+                      
+                      {formData.enableTax && !formData.allowCustomAmount && (
+                        <>
+                          <div className="flex justify-between mb-3">
+                            <span className={`${
+                              formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                            }`}>Tax ({formData.taxPercentage}%)</span>
+                            <span className="font-semibold">
+                              {formData.price ? 
+                                `${formData.currency === 'USD' ? '$' : 
+                                  formData.currency === 'EUR' ? '€' : 
+                                  formData.currency === 'GBP' ? '£' : 
+                                  formData.currency}${(parseFloat(formData.price) * parseFloat(formData.taxPercentage) / 100).toFixed(2)}` 
+                                : '$0.00'}
+                            </span>
+                          </div>
+                          
+                          <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                          
+                          <div className="flex justify-between font-bold">
+                            <span>Total</span>
+                            <span>
+                              {formData.currency === 'USD' ? '$' : 
+                                formData.currency === 'EUR' ? '€' : 
+                                formData.currency === 'GBP' ? '£' : 
+                                formData.currency}
+                              {calculateTotal()}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    
+                    {formData.allowCustomAmount && (
+                      <div className="mb-6">
+                        <Label htmlFor="customAmount" className={`${
+                          formData.theme === 'dark' ? 'text-white' : 'text-gray-700'
+                        }`}>
+                          Enter amount
+                        </Label>
+                        <div className="relative mt-1">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <span className={`${
+                              formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                            }`}>$</span>
+                          </div>
+                          <Input 
+                            id="customAmount" 
+                            placeholder="0.00"
+                            className={`pl-8 ${
+                              formData.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : ''
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="mb-6">
+                      <Label htmlFor="paymentMethod" className={`${
+                        formData.theme === 'dark' ? 'text-white' : 'text-gray-700'
+                      }`}>
+                        Payment method
+                      </Label>
+                      <div className={`mt-2 flex flex-wrap gap-2 ${
+                        formData.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
+                      } p-3 rounded-lg`}>
+                        <div className={`flex items-center rounded-md px-3 py-2 ${
+                          formData.theme === 'dark' ? 'bg-gray-700' : 'bg-white border border-gray-200'
+                        }`}>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          <span className="text-sm">Card</span>
+                        </div>
+                        
+                        <div className={`flex items-center rounded-md px-3 py-2 ${
+                          formData.theme === 'dark' ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <Smartphone className="h-4 w-4 mr-2" />
+                          <span className="text-sm">Mobile Pay</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      className={`w-full ${
+                        formData.theme === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
+                        formData.theme === 'green' ? 'bg-green-600 hover:bg-green-700' :
+                        formData.theme === 'purple' ? 'bg-purple-600 hover:bg-purple-700' :
+                        ''
+                      }`}
+                    >
+                      {formData.buttonText || 'Pay Now'}
+                    </Button>
+                    
+                    {formData.termsAndConditions && (
+                      <div className={`mt-4 text-xs ${
+                        formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        By proceeding with the payment, you agree to the <span className="underline">terms and conditions</span>.
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className={`p-4 border-t ${
+                    formData.theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+                  } text-xs text-center flex justify-center items-center gap-2`}>
+                    <span className={formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                      Powered by
+                    </span>
+                    <span className="font-semibold">Paymesa</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-8 max-w-md mx-auto">
+                <h3 className="text-base font-medium mb-3">Payment Link</h3>
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center text-sm">
                     <LinkIcon className="h-4 w-4 mr-2 text-gray-500" />
@@ -644,27 +662,51 @@ export default function PaymentLinksPage() {
                   </Button>
                 </div>
                 
-                <div className="flex justify-between">
-                  <Button variant="outline" className="mr-2">Preview in new tab</Button>
-                  <Button variant="outline">
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <Button variant="outline" className="w-full">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview in new tab
+                  </Button>
+                  <Button variant="outline" className="w-full">
                     <QrCode className="h-4 w-4 mr-2" />
                     Show QR Code
                   </Button>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                  <h4 className="text-sm font-medium text-blue-700 flex items-center">
+                    <CircleDollarSign className="h-4 w-4 mr-2" />
+                    Pro Tips
+                  </h4>
+                  <ul className="mt-2 text-xs text-blue-700 space-y-1 pl-6 list-disc">
+                    <li>Add a compelling product description to increase conversion rates</li>
+                    <li>Keep your payment button text clear and action-oriented</li>
+                    <li>Set a reasonable expiration date for time-sensitive offers</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
           
-          <DialogFooter className="mt-6">
+          <DialogFooter className="mt-6 border-t pt-4 flex-col sm:flex-row gap-3">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="sm:mr-auto">Cancel</Button>
             </DialogClose>
-            <Button 
-              onClick={createPaymentLink}
-              disabled={!formData.name}
-            >
-              Create Payment Link
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline"
+                className="flex-1"
+              >
+                Save as Draft
+              </Button>
+              <Button 
+                className="flex-1"
+                onClick={createPaymentLink}
+                disabled={!formData.name}
+              >
+                Create Payment Link
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
