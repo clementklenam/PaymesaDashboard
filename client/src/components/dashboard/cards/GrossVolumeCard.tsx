@@ -1,8 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, TrendingUp, ExternalLink } from "lucide-react";
 import { AreaChart } from "../charts/AreaChart";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 interface GrossVolumeCardProps {
   timeRange: number;
@@ -31,27 +32,36 @@ export const GrossVolumeCard = ({ timeRange }: GrossVolumeCardProps) => {
     : [0, 5, 10, 8, 15, 25, 18]; // Fallback
 
   return (
-    <Card>
+    <Card className="shadow-sm border-gray-100 overflow-hidden card-highlight">
       <CardContent className="p-6">
-        <div className="flex items-center">
-          <h3 className="text-lg font-medium text-gray-900">Gross volume</h3>
-          <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
-            percentChange >= 0 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-          }`}>
-            {percentChange >= 0 
-              ? <ArrowUp className="inline h-3 w-3 mr-1" /> 
-              : <ArrowDown className="inline h-3 w-3 mr-1" />
-            }
-            <span>{Math.abs(Math.round(percentChange))}%</span>
-          </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-primary/10 p-2 rounded-md mr-4">
+              <TrendingUp className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-base font-medium text-gray-700">Gross Volume</h3>
+              <div className="flex items-center mt-1">
+                <span className="text-2xl font-bold text-gray-900">${grossVolume.toFixed(2)}</span>
+                <Badge className={`ml-2 ${
+                  percentChange >= 0 
+                    ? 'bg-green-100 text-green-800 hover:bg-green-100' 
+                    : 'bg-red-100 text-red-800 hover:bg-red-100'
+                }`}>
+                  {percentChange >= 0 
+                    ? <ArrowUp className="inline h-3 w-3 mr-1" /> 
+                    : <ArrowDown className="inline h-3 w-3 mr-1" />
+                  }
+                  <span>{Math.abs(Math.round(percentChange))}%</span>
+                </Badge>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="mt-2 text-3xl font-semibold text-gray-900">${grossVolume.toFixed(2)}</div>
-        <div className="text-sm text-gray-500">${previousPeriod.toFixed(2)} previous period</div>
+        <div className="text-sm text-gray-500 mt-1">${previousPeriod.toFixed(2)} previous period</div>
         
         <div className="mt-4 chart-container">
-          <AreaChart data={chartData} />
+          <AreaChart data={chartData} color="hsl(var(--primary))" />
         </div>
         
         <div className="mt-1 grid grid-cols-2 text-xs text-gray-500">
@@ -60,7 +70,10 @@ export const GrossVolumeCard = ({ timeRange }: GrossVolumeCardProps) => {
         </div>
         
         <div className="mt-4 text-xs text-gray-500 flex justify-between">
-          <button className="text-primary font-medium">View more</button>
+          <button className="text-primary font-medium hover:text-primary/80 transition-colors flex items-center">
+            View details
+            <ExternalLink className="h-3 w-3 ml-1" />
+          </button>
           <span>Updated {format(new Date(), 'h:mm a')}</span>
         </div>
       </CardContent>
