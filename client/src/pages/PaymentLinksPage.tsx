@@ -105,21 +105,29 @@ export default function PaymentLinksPage() {
   // Generate a preview URL based on form data
   const previewUrl = `https://pay.paymesa.com/p/${formData.name.toLowerCase().replace(/\s+/g, '-')}`;
 
-  // Function to handle form input changes
+  // Function to handle form input changes with debounce to prevent excessive refreshing
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    e.preventDefault(); // Prevent default form submission
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Use setTimeout to batch state updates and prevent constant refreshing
+    setTimeout(() => {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }, 100);
   };
 
   // Function to handle switch toggles
   const handleSwitchChange = (name: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: checked
-    }));
+    // Use setTimeout to batch state updates and prevent constant refreshing
+    setTimeout(() => {
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+      }));
+    }, 100);
   };
 
   // Function to calculate total with tax (if enabled)
@@ -302,7 +310,11 @@ export default function PaymentLinksPage() {
                       <Select 
                         name="currency" 
                         value={formData.currency} 
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}
+                        onValueChange={(value) => {
+                          setTimeout(() => {
+                            setFormData(prev => ({ ...prev, currency: value }));
+                          }, 100);
+                        }}
                       >
                         <SelectTrigger id="currency">
                           <SelectValue placeholder="Select currency" />
@@ -387,7 +399,11 @@ export default function PaymentLinksPage() {
                   <Select 
                     name="theme" 
                     value={formData.theme} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, theme: value }))}
+                    onValueChange={(value) => {
+                      setTimeout(() => {
+                        setFormData(prev => ({ ...prev, theme: value }));
+                      }, 100);
+                    }}
                   >
                     <SelectTrigger id="theme">
                       <SelectValue placeholder="Select theme" />
