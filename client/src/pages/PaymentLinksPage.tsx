@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layouts/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +15,124 @@ import {
   CircleDollarSign,
   ArrowUpRight,
   Eye,
-  CheckCircle
+  CheckCircle,
+  ArrowRight,
+  Image,
+  FileText,
+  Smartphone,
+  Globe,
+  CreditCard,
+  X,
+  Check,
+  QrCode,
+  Share2
 } from "lucide-react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+
+// Type definitions
+interface PaymentLink {
+  id: string;
+  name: string;
+  description: string;
+  price: number | null;
+  currency: string;
+  created: Date;
+  status: 'active' | 'inactive';
+  views: number;
+  conversions: number;
+  url: string;
+}
+
+interface PaymentLinkFormData {
+  name: string;
+  description: string;
+  price: string;
+  currency: string;
+  allowCustomAmount: boolean;
+  enableTax: boolean;
+  taxPercentage: string;
+  buttonText: string;
+  theme: string;
+  successMessage: string;
+  termsAndConditions: string;
+  image: string;
+  expiresAt: string;
+}
 
 export default function PaymentLinksPage() {
+  // State for payment link builder
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [formData, setFormData] = useState<PaymentLinkFormData>({
+    name: '',
+    description: '',
+    price: '',
+    currency: 'USD',
+    allowCustomAmount: false,
+    enableTax: false,
+    taxPercentage: '0',
+    buttonText: 'Pay Now',
+    theme: 'light',
+    successMessage: 'Thank you for your payment!',
+    termsAndConditions: '',
+    image: '',
+    expiresAt: ''
+  });
+
+  // Generate a preview URL based on form data
+  const previewUrl = `https://pay.paymesa.com/p/${formData.name.toLowerCase().replace(/\s+/g, '-')}`;
+
+  // Function to handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Function to handle switch toggles
+  const handleSwitchChange = (name: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
+    }));
+  };
+
+  // Function to calculate total with tax (if enabled)
+  const calculateTotal = (): string => {
+    if (!formData.price || isNaN(parseFloat(formData.price))) return '0.00';
+    
+    const price = parseFloat(formData.price);
+    if (!formData.enableTax) return price.toFixed(2);
+    
+    const taxRate = parseFloat(formData.taxPercentage) / 100;
+    const taxAmount = price * taxRate;
+    return (price + taxAmount).toFixed(2);
+  };
+
   // Mock payment links data
   const paymentLinks = [
     { 
@@ -97,12 +209,477 @@ export default function PaymentLinksPage() {
       });
   };
 
+  // Function to create a new payment link
+  const createPaymentLink = () => {
+    // Here we'd normally submit to the server
+    // For this demo, we'll just close the builder
+    setShowBuilder(false);
+    
+    // Reset form data
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      currency: 'USD',
+      allowCustomAmount: false,
+      enableTax: false,
+      taxPercentage: '0',
+      buttonText: 'Pay Now',
+      theme: 'light',
+      successMessage: 'Thank you for your payment!',
+      termsAndConditions: '',
+      image: '',
+      expiresAt: ''
+    });
+  };
+
+  // PaymentLinkBuilder component
+  const PaymentLinkBuilder = () => {
+    return (
+      <Dialog open={showBuilder} onOpenChange={setShowBuilder}>
+        <DialogContent className="max-w-6xl">
+          <DialogHeader>
+            <DialogTitle>Create Payment Link</DialogTitle>
+            <DialogDescription>
+              Create a custom payment link for your customers to pay online
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+            {/* Form */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h3 className="text-base font-medium">Basic Information</h3>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Product or Service Name</Label>
+                    <Input 
+                      id="name" 
+                      name="name" 
+                      value={formData.name} 
+                      onChange={handleInputChange} 
+                      placeholder="e.g. Website Design Package"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea 
+                      id="description" 
+                      name="description" 
+                      value={formData.description} 
+                      onChange={handleInputChange} 
+                      placeholder="Describe what you're selling"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="price">Price</Label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <span className="text-gray-500">$</span>
+                        </div>
+                        <Input 
+                          id="price" 
+                          name="price" 
+                          value={formData.price} 
+                          onChange={handleInputChange} 
+                          placeholder="0.00"
+                          className="pl-8"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          disabled={formData.allowCustomAmount}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select 
+                        name="currency" 
+                        value={formData.currency} 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}
+                      >
+                        <SelectTrigger id="currency">
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD - US Dollar</SelectItem>
+                          <SelectItem value="EUR">EUR - Euro</SelectItem>
+                          <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                          <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                          <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="allowCustomAmount">Allow customer to set amount</Label>
+                      <div className="text-xs text-gray-500">Customer can enter their own payment amount</div>
+                    </div>
+                    <Switch 
+                      id="allowCustomAmount" 
+                      checked={formData.allowCustomAmount}
+                      onCheckedChange={(checked) => handleSwitchChange('allowCustomAmount', checked)}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <h3 className="text-base font-medium">Tax & Pricing</h3>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="enableTax">Enable tax</Label>
+                    <div className="text-xs text-gray-500">Add tax to the payment amount</div>
+                  </div>
+                  <Switch 
+                    id="enableTax" 
+                    checked={formData.enableTax}
+                    onCheckedChange={(checked) => handleSwitchChange('enableTax', checked)}
+                  />
+                </div>
+                
+                {formData.enableTax && (
+                  <div className="space-y-2 pt-2">
+                    <Label htmlFor="taxPercentage">Tax percentage (%)</Label>
+                    <Input 
+                      id="taxPercentage" 
+                      name="taxPercentage" 
+                      value={formData.taxPercentage} 
+                      onChange={handleInputChange} 
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <h3 className="text-base font-medium">Appearance</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="buttonText">Payment Button Text</Label>
+                  <Input 
+                    id="buttonText" 
+                    name="buttonText" 
+                    value={formData.buttonText} 
+                    onChange={handleInputChange} 
+                    placeholder="Pay Now"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="theme">Color Theme</Label>
+                  <Select 
+                    name="theme" 
+                    value={formData.theme} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, theme: value }))}
+                  >
+                    <SelectTrigger id="theme">
+                      <SelectValue placeholder="Select theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="blue">Blue</SelectItem>
+                      <SelectItem value="green">Green</SelectItem>
+                      <SelectItem value="purple">Purple</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="image">Product Image URL</Label>
+                  <Input 
+                    id="image" 
+                    name="image" 
+                    value={formData.image} 
+                    onChange={handleInputChange} 
+                    placeholder="https://example.com/image.jpg"
+                  />
+                  <div className="text-xs text-gray-500">Optional: Add an image to your payment page</div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <h3 className="text-base font-medium">Additional Settings</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="successMessage">Success Message</Label>
+                  <Textarea 
+                    id="successMessage" 
+                    name="successMessage" 
+                    value={formData.successMessage} 
+                    onChange={handleInputChange} 
+                    placeholder="Thank you for your payment!"
+                    rows={2}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="termsAndConditions">Terms and Conditions</Label>
+                  <Textarea 
+                    id="termsAndConditions" 
+                    name="termsAndConditions" 
+                    value={formData.termsAndConditions} 
+                    onChange={handleInputChange} 
+                    placeholder="Optional: Add your terms and conditions"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="expiresAt">Expiration Date (Optional)</Label>
+                  <Input 
+                    id="expiresAt" 
+                    name="expiresAt" 
+                    value={formData.expiresAt} 
+                    onChange={handleInputChange} 
+                    type="date"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Preview */}
+            <div className="space-y-4">
+              <h3 className="text-base font-medium">Preview</h3>
+              
+              <div className={`border rounded-lg overflow-hidden ${
+                formData.theme === 'dark' ? 'bg-gray-900 text-white' :
+                formData.theme === 'blue' ? 'bg-blue-50' :
+                formData.theme === 'green' ? 'bg-green-50' :
+                formData.theme === 'purple' ? 'bg-purple-50' :
+                'bg-white'
+              }`}>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <div className={`${
+                      formData.theme === 'dark' ? 'text-white' :
+                      formData.theme === 'blue' ? 'text-blue-600' :
+                      formData.theme === 'green' ? 'text-green-600' :
+                      formData.theme === 'purple' ? 'text-purple-600' :
+                      'text-primary'
+                    } text-xl font-bold`}>Paymesa</div>
+                    
+                    <div className={`${
+                      formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                    } text-sm flex items-center`}>
+                      <Globe className="h-4 w-4 mr-1" />
+                      Secure payment
+                    </div>
+                  </div>
+                  
+                  {formData.image && (
+                    <div className="mb-4 rounded-lg overflow-hidden h-40 bg-gray-100 flex items-center justify-center">
+                      <Image className="h-10 w-10 text-gray-400" />
+                    </div>
+                  )}
+                  
+                  <div className="mb-6">
+                    <h2 className={`text-lg font-semibold ${
+                      formData.theme === 'dark' ? 'text-white' : 'text-gray-800'
+                    }`}>
+                      {formData.name || 'Product or Service Name'}
+                    </h2>
+                    <p className={`${
+                      formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
+                      {formData.description || 'Product or service description goes here'}
+                    </p>
+                  </div>
+                  
+                  <div className={`${
+                    formData.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
+                  } p-4 rounded-lg mb-6`}>
+                    <div className="flex justify-between mb-3">
+                      <span className={`${
+                        formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                      }`}>Price</span>
+                      <span className="font-semibold">
+                        {formData.allowCustomAmount ? 'Custom amount' : 
+                          formData.price ? 
+                            `${formData.currency === 'USD' ? '$' : 
+                              formData.currency === 'EUR' ? '€' : 
+                              formData.currency === 'GBP' ? '£' : 
+                              formData.currency}${formData.price}` 
+                            : '$0.00'}
+                      </span>
+                    </div>
+                    
+                    {formData.enableTax && !formData.allowCustomAmount && (
+                      <>
+                        <div className="flex justify-between mb-3">
+                          <span className={`${
+                            formData.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                          }`}>Tax ({formData.taxPercentage}%)</span>
+                          <span className="font-semibold">
+                            {formData.price ? 
+                              `${formData.currency === 'USD' ? '$' : 
+                                formData.currency === 'EUR' ? '€' : 
+                                formData.currency === 'GBP' ? '£' : 
+                                formData.currency}${(parseFloat(formData.price) * parseFloat(formData.taxPercentage) / 100).toFixed(2)}` 
+                              : '$0.00'}
+                          </span>
+                        </div>
+                        
+                        <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                        
+                        <div className="flex justify-between font-bold">
+                          <span>Total</span>
+                          <span>
+                            {formData.currency === 'USD' ? '$' : 
+                              formData.currency === 'EUR' ? '€' : 
+                              formData.currency === 'GBP' ? '£' : 
+                              formData.currency}
+                            {calculateTotal()}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  
+                  {formData.allowCustomAmount && (
+                    <div className="mb-6">
+                      <Label htmlFor="customAmount" className={`${
+                        formData.theme === 'dark' ? 'text-white' : 'text-gray-700'
+                      }`}>
+                        Enter amount
+                      </Label>
+                      <div className="relative mt-1">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <span className={`${
+                            formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>$</span>
+                        </div>
+                        <Input 
+                          id="customAmount" 
+                          placeholder="0.00"
+                          className={`pl-8 ${
+                            formData.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mb-6">
+                    <Label htmlFor="paymentMethod" className={`${
+                      formData.theme === 'dark' ? 'text-white' : 'text-gray-700'
+                    }`}>
+                      Payment method
+                    </Label>
+                    <div className={`mt-2 flex flex-wrap gap-2 ${
+                      formData.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-3 rounded-lg`}>
+                      <div className={`flex items-center rounded-md px-3 py-2 ${
+                        formData.theme === 'dark' ? 'bg-gray-700' : 'bg-white border border-gray-200'
+                      }`}>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Card</span>
+                      </div>
+                      
+                      <div className={`flex items-center rounded-md px-3 py-2 ${
+                        formData.theme === 'dark' ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        <Smartphone className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Mobile Pay</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    className={`w-full ${
+                      formData.theme === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
+                      formData.theme === 'green' ? 'bg-green-600 hover:bg-green-700' :
+                      formData.theme === 'purple' ? 'bg-purple-600 hover:bg-purple-700' :
+                      ''
+                    }`}
+                  >
+                    {formData.buttonText || 'Pay Now'}
+                  </Button>
+                  
+                  {formData.termsAndConditions && (
+                    <div className={`mt-4 text-xs ${
+                      formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      By proceeding with the payment, you agree to the <span className="underline">terms and conditions</span>.
+                    </div>
+                  )}
+                </div>
+                
+                <div className={`p-4 border-t ${
+                  formData.theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+                } text-xs text-center flex justify-center items-center gap-2`}>
+                  <span className={formData.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                    Powered by
+                  </span>
+                  <span className="font-semibold">Paymesa</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center text-sm">
+                    <LinkIcon className="h-4 w-4 mr-2 text-gray-500" />
+                    <span className="text-primary font-medium">{previewUrl}</span>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => copyToClipboard(previewUrl)}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex justify-between">
+                  <Button variant="outline" className="mr-2">Preview in new tab</Button>
+                  <Button variant="outline">
+                    <QrCode className="h-4 w-4 mr-2" />
+                    Show QR Code
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="mt-6">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={createPaymentLink}
+              disabled={!formData.name}
+            >
+              Create Payment Link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
     <DashboardLayout 
       title="Payment Links" 
       description="Create and share payment links for your products and services"
     >
       <div className="space-y-6">
+        {/* Payment Link Builder */}
+        <PaymentLinkBuilder />
+
         {/* Quick Start Guide */}
         <Card className="shadow-sm border-gray-100 bg-gradient-to-r from-primary/5 to-primary/10">
           <CardContent className="p-6">
@@ -113,7 +690,7 @@ export default function PaymentLinksPage() {
                   Payment links let you accept payments without building a website or integrating code. 
                   Create a link, share it with your customers, and get paid instantly.
                 </p>
-                <Button>
+                <Button onClick={() => setShowBuilder(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Payment Link
                 </Button>
@@ -196,7 +773,7 @@ export default function PaymentLinksPage() {
           </div>
           
           <div className="flex space-x-2">
-            <Button>
+            <Button onClick={() => setShowBuilder(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Create Payment Link
             </Button>
