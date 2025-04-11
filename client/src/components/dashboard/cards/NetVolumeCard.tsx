@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, DollarSign, ExternalLink } from "lucide-react";
 import { AreaChart } from "../charts/AreaChart";
@@ -21,17 +22,16 @@ export const NetVolumeCard = ({ timeRange }: NetVolumeCardProps) => {
   });
   
   const netVolume = summary?.netVolume ?? 31.11;
-  const previousPeriod = 0; // Default to 0 for previous period
+  const previousPeriod = 0;
   const percentChange = previousPeriod > 0 
     ? ((netVolume - previousPeriod) / previousPeriod) * 100 
-    : 5; // Default to 5% if previous period is 0
+    : 5;
     
-  // Generate data for chart
   const chartData = transactions 
     ? transactions
         .filter((t: any) => t.status === 'succeeded')
         .map((t: any) => Number(t.amount))
-    : [0, 4, 8, 7, 13, 20, 15]; // Fallback
+    : [0, 4, 8, 7, 13, 20, 15];
 
   return (
     <Card className="shadow-sm border-gray-100 overflow-hidden card-highlight">
