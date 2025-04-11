@@ -35,7 +35,7 @@ export const Header = () => {
             </Badge>
           </div>
         </div>
-        
+
         <div className="hidden md:flex items-center gap-4">
           <div className="text-xs bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-md flex items-center">
             <AlertTriangle className="h-3.5 w-3.5 text-amber-500 mr-1.5" />
@@ -45,13 +45,13 @@ export const Header = () => {
             Complete profile
             <ArrowRight className="h-3.5 w-3.5 ml-1" />
           </a>
-          
+
           <div className="flex items-center ml-2">
             <button className="relative p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
             </button>
-            
+
             <div className="flex items-center ml-4 cursor-pointer hover:opacity-90 transition-opacity">
               <Avatar className="h-8 w-8 border border-gray-200">
                 <AvatarFallback className="text-sm font-medium bg-primary/10 text-primary">PM</AvatarFallback>
@@ -77,45 +77,15 @@ export const Header = () => {
 
 export const SearchBar = () => {
   const [testMode, setTestMode] = useState(true);
-  
+
   return (
-    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-      <div className="relative max-w-md w-full">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="text-gray-400 h-4 w-4" />
-        </div>
-        <Input 
-          type="text" 
-          className="pl-10 pr-3 py-2 border-gray-100 bg-white shadow-sm focus-visible:ring-primary/30" 
-          placeholder="Search transactions, customers..."
-        />
-      </div>
-      
-      <div className="flex items-center space-x-4">
-        <div className="bg-white shadow-sm border border-gray-100 rounded-md px-3 py-1.5 flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-700">Test mode</span>
-          <Switch 
-            checked={testMode}
-            onCheckedChange={setTestMode}
-            className="data-[state=checked]:bg-primary"
-          />
-        </div>
-        <div className="flex space-x-1">
-          <button className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors relative">
-            <BellIcon className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-          </button>
-          <button className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-            <BarChart2 className="h-5 w-5" />
-          </button>
-          <button className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-            <Settings className="h-5 w-5" />
-          </button>
-          <button className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-            <HelpCircle className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
+    <div className="relative mb-4 md:mb-6 mt-2 md:mt-0">
+      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+      <Input
+        type="search"
+        placeholder="Search transactions, customers..."
+        className="pl-8 bg-white w-full md:w-auto"
+      />
     </div>
   );
 };
