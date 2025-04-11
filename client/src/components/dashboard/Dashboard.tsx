@@ -1,6 +1,7 @@
 import { Header, SearchBar } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { TodaySummary } from "./TodaySummary";
+import { Banner } from "./Banner";
 import { TimelineChart } from "./TimelineChart";
 import { Overview } from "./Overview";
 import { useState } from "react";
@@ -19,10 +20,7 @@ export const Dashboard = () => {
           <div className="max-w-7xl mx-auto">
             <SearchBar />
             
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-800 mb-1">Dashboard Overview</h1>
-              <p className="text-gray-500">View your payments, transactions, and customer activity in real-time</p>
-            </div>
+            <Banner />
             
             <TodaySummary />
             
