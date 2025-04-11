@@ -73,7 +73,7 @@ export const NewCustomersCard = ({ timeRange }: NewCustomersCardProps) => {
         <div className="text-sm text-gray-500 mt-1">{previousPeriod} previous period</div>
         
         <div className="mt-4 chart-container">
-          <AreaChart data={chartData} color="hsl(142, 71%, 45%)" />
+          <AreaChart data={chartData} color="hsl(var(--primary))" />
         </div>
         
         <div className="mt-1 grid grid-cols-2 text-xs text-gray-500">

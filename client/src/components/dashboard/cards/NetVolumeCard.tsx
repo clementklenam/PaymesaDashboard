@@ -63,7 +63,7 @@ export const NetVolumeCard = ({ timeRange }: NetVolumeCardProps) => {
         <div className="text-sm text-gray-500 mt-1">${previousPeriod.toFixed(2)} previous period</div>
         
         <div className="mt-4 chart-container">
-          <AreaChart data={chartData} color="hsl(234, 89%, 74%)" />
+          <AreaChart data={chartData} color="hsl(var(--primary))" />
         </div>
         
         <div className="mt-1 grid grid-cols-2 text-xs text-gray-500">
